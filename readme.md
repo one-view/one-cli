@@ -7,6 +7,30 @@
 server | based on koa2
 static | browser-side | web
 
+## download template/boilerplate
+
+one config
+
+$name: 'test'
+$path: 'test/datsd'
+
+$default: 'one-view/test'
+
+
+
+-- default
+    -- path
+
+-- list: []
+    {
+        name: 'list',
+        path: 'test/add'
+    }
+
+key: download-git-repo
+
+// bin name conflict
+
 ### proposal
 one start
 
@@ -20,5 +44,5 @@ $ npm link
 
 取消绑定
 ```
-npm unlink
+$ npm unlink
 ```
