@@ -31,9 +31,32 @@ const cmds = [
   {
     name: 'config',
     desc: 'cli tool setting'
+  },
+  {
+    name: 'list',
+    desc: 'list all options into'
+  },
+  {
+    name: 'help',
+    desc: 'all options of help doc'
+  },
+  {
+    name: 'init',
+    desc: ''
+  },
+  {
+    name: 'get',
+    desc: 'get resource from remote'
+  },
+  {
+    name: 'set'
+  },
+  {
+    name: ''
   }
 ]
 
+// 基础 Koa 服务脚手架
 // console.log(chalk.yellow(`  A newer version of one-cli is available.`))
 // console.log()
 // console.log('  latest:    ' + chalk.green('1.1.1'))
@@ -46,6 +69,40 @@ cmds.forEach(cmd => {
     console.log('command line: ', name)
   })
 })
+
+commander
+  .command('demo')
+  .option('-f --force', 'force')
+  .description('test use')
+  .action((cmd) => {
+    inquirer
+      .prompt([
+        {
+          type: 'confirm',
+          name: 'ok',
+          message: 'Generate project in current directory?'
+        }, {
+          type: 'input',
+          name: 'input',
+          message: 'input directory name',
+          validate (val) {
+            let isBlank = !val
+            let message = isBlank ? 'do not allow blank value' : null
+            return !isBlank || message
+          }
+        }, {
+          type: 'list',
+          name: 'type',
+          message: 'choose list',
+          choices: ['a', 'b', 'c']
+        }
+      ])
+      .then(answers => {
+        let {ok, input, type} = answers
+        // let res = answers.ok ? 'ok' : 'fail'
+        console.log(ok, input, type, process.cwd())
+      })
+  })
 
 commander
   .command('dev <path>')
@@ -116,6 +173,6 @@ commander
   })
   // checkversion make sure for update with friendly ui
 
-console.log('inquirer')
+// console.log('inquirer')
 // custom-cli
 commander.parse(process.argv)
