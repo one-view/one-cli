@@ -8,10 +8,18 @@ const inquirer = require('inquirer')
 
 const { version } = require('./package.json')
 
+const file = require('./lib/file')
+const commands = require('./commands')
 // commander.version(version)
 
 commander.version(version, '-v, --version')
 
+const cwd = process.cwd()
+
+console.log(file.existsDirectory(cwd, 'lib'))
+console.log(file.existsDirectory(cwd, '/bin'))
+console.log(file.exists('lib'))
+console.log(file.exists('/bin'))
 /**
 $ one init
 $ one ftp
@@ -19,42 +27,6 @@ $ one create
 $ one test
 $ one api
  */
-const cmds = [
-  {
-    name: 'init',
-    desc: 'initialize a new project'
-  },
-  {
-    name: 'ftp',
-    desc: 'ftp resource'
-  },
-  {
-    name: 'config',
-    desc: 'cli tool setting'
-  },
-  {
-    name: 'list',
-    desc: 'list all options into'
-  },
-  {
-    name: 'help',
-    desc: 'all options of help doc'
-  },
-  {
-    name: 'init',
-    desc: ''
-  },
-  {
-    name: 'get',
-    desc: 'get resource from remote'
-  },
-  {
-    name: 'set'
-  },
-  {
-    name: ''
-  }
-]
 
 // 基础 Koa 服务脚手架
 // console.log(chalk.yellow(`  A newer version of one-cli is available.`))
@@ -63,46 +35,69 @@ const cmds = [
 // console.log('  installed: ' + chalk.red('1.0.0'))
 // console.log()
 
-cmds.forEach(cmd => {
-  let { name, desc } = cmd
-  commander.command(name).description(desc).action(() => {
-    console.log('command line: ', name)
-  })
-})
+// cmds.forEach(cmd => {
+//   let { name, desc } = cmd
+//   commander.command(name).description(desc).action(() => {
+//     console.log('command line: ', name)
+//   })
+// })
 
 commander
   .command('demo')
-  .option('-f --force', 'force')
+  .option('-f --force', 'Overwrite target directory if it exists')
+  .option('-n --no-git', 'Skip git initialization')
+  .option('-c --clone', 'Use git clone when fetching remote preset')
+  .option('-b --bare', 'Scaffold project without beginner instructions')
+  .option('-p --preset <presetName>', 'Skip prompts and use saved or remote preset')
   .description('test use')
   .action((cmd) => {
-    inquirer
-      .prompt([
-        {
-          type: 'confirm',
-          name: 'ok',
-          message: 'Generate project in current directory?'
-        }, {
-          type: 'input',
-          name: 'input',
-          message: 'input directory name',
-          validate (val) {
-            let isBlank = !val
-            let message = isBlank ? 'do not allow blank value' : null
-            return !isBlank || message
-          }
-        }, {
-          type: 'list',
-          name: 'type',
-          message: 'choose list',
-          choices: ['a', 'b', 'c']
-        }
-      ])
-      .then(answers => {
-        let {ok, input, type} = answers
-        // let res = answers.ok ? 'ok' : 'fail'
-        console.log(ok, input, type, process.cwd())
-      })
+    // console.log(cmd)
+    let opts = cmd.options
+
+    let cleanOpts = opts.reduce((res, opt) => {
+      console.log(opt.long)
+      let key = opt.long.replace(/^--/, '')
+      if (typeof cmd[key] !== 'function' && typeof cmd[key] !== 'undefined') {
+        res[key] = cmd[key]
+      }
+      return res
+    }, {})
+    console.log(cleanOpts)
+    // inquirer
+    //   .prompt([
+    //     {
+    //       type: 'confirm',
+    //       name: 'ok',
+    //       message: 'Generate project in current directory?'
+    //     }, {
+    //       type: 'input',
+    //       name: 'input',
+    //       message: 'input directory name',
+    //       validate (val) {
+    //         let isBlank = !val
+    //         let message = isBlank ? 'do not allow blank value' : null
+    //         return !isBlank || message
+    //       }
+    //     }, {
+    //       type: 'list',
+    //       name: 'type',
+    //       message: 'choose list',
+    //       choices: ['a', 'b', 'c']
+    //     }
+    //   ])
+    //   .then(answers => {
+    //     let {ok, input, type} = answers
+    //     // let res = answers.ok ? 'ok' : 'fail'
+    //     console.log(ok, input, type, process.cwd())
+    //     // __dirname 当前文件所在目录
+    //     // process.cwd() 运行时目录
+    //   })
   })
+
+commander
+  .command('config')
+  .description('adjust setting')
+  .action(commands.config)
 
 commander
   .command('dev <path>')
